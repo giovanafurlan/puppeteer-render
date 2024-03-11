@@ -56,6 +56,9 @@ const scrapeLogic = async (res) => {
     // preencher o campo de senha
     await page.type('input[name="session_password"]', "Fur0412*");
 
+    // Esperar até que o botão "Sign in" esteja disponível
+    await page.waitForSelector('button[data-litms-control-urn="login-submit"]');
+
     // Pegar o texto do botão "Sign in"
     const signInButtonText = await page.evaluate(() => {
       const signInButton = document.querySelector(
@@ -66,7 +69,10 @@ const scrapeLogic = async (res) => {
 
     if (signInButtonText === "Sign in") {
       // Se o texto do botão for "Sign in", então clicar no botão
-      await page.click('button[data-litms-control-urn="login-submit"]');
+      await Promise.all([
+        page.waitForNavigation(), // Esperar a navegação
+        page.click('button[data-litms-control-urn="login-submit"]'), // Clicar no botão
+      ]);
       console.log('Clicou no botão "Sign in"');
     } else {
       console.log('Não encontrou o botão "Sign in"');
