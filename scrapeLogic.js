@@ -17,7 +17,7 @@ const scrapeLogic = async (res) => {
   try {
     const page = await browser.newPage();
 
-    await page.goto("https://www.linkedin.com/in/joao-pedro-eb/");
+    await page.goto("https://www.linkedin.com");
 
     // Set screen size
     await page.setViewport({ width: 1080, height: 1024 });
@@ -26,6 +26,27 @@ const scrapeLogic = async (res) => {
     let funcao;
     let localizacao;
     let experiencias;
+
+    // clica no link de login
+    await page.click("a.main__sign-in-link");
+
+    // preencher o campo de e-mail
+    await page.type(
+      'input[name="session_key"]',
+      "backupgiovanafurlan@outlook.com"
+    );
+
+    // preencher o campo de senha
+    await page.type('input[name="session_password"]', "Fur0412*");
+
+    // clicar no botão de login
+    await page.click('button[aria-label="Sign in"]');
+
+    // aguardar um pouco para permitir que a página seja carregada completamente após o login
+    await page.waitForTimeout(5000); // Ajuste o tempo conforme necessário
+
+    // redirecionar para a página do perfil
+    await page.goto("https://www.linkedin.com/in/giovana-furlan/");
 
     // pegar título
     const title = await page.title();
