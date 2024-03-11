@@ -27,8 +27,11 @@ const scrapeLogic = async (res) => {
     let localizacao;
     let experiencias;
 
-    // clica no link de login
-    await page.click("a.main__sign-in-link");
+    // aguarda até que o elemento esteja disponível na página
+    await page.waitForSelector(".main__sign-in-link");
+
+    // clica no link usando o seletor CSS
+    await page.click(".main__sign-in-link");
 
     // preencher o campo de e-mail
     await page.type(
