@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
@@ -27,6 +27,8 @@ const scrapeLogic = async (res) => {
     let funcao;
     let localizacao;
     let experiencias;
+
+    const screenshot = await page.screenshot({ path: 'screenshot.png' });
 
     // aguarda até que o elemento esteja disponível na página
     await page.waitForSelector(".main__sign-in-link");
@@ -115,7 +117,7 @@ const scrapeLogic = async (res) => {
     });
 
     // Retornando a resposta como JSON
-    res.json({ title, sobre, funcao, localizacao, experiencias });
+    res.json({ screenshot });
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
