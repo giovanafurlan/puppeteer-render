@@ -31,7 +31,39 @@ const scrapeLogic = async (res) => {
     const title = await page.title();
 
     // tira um print da página e salva como 'screenshot.png'
-    const screenshot = await page.screenshot({ path: 'screenshot.png' });
+    const screenshot = await page.screenshot({ path: "screenshot.png" });
+
+    // Pegar o texto do link "Sign in"
+    const signInLinkText = await page.evaluate(() => {
+      const signInLink = document.querySelector("a.main__sign-in-link");
+      return signInLink ? signInLink.textContent.trim() : null;
+    });
+
+    if (signInLinkText === "Sign in") {
+      // Se o texto do link for "Sign in", então clicar no link
+      await page.click("a.main__sign-in-link");
+      console.log('Clicou no link "Sign in"');
+    } else {
+      console.log('Não encontrou o link "Sign in"');
+    }
+
+    // preencher o campo de e-mail
+    await page.type(
+      'input[name="session_key"]',
+      "backupgiovanafurlan@outlook.com"
+    );
+
+    // preencher o campo de senha
+    await page.type('input[name="session_password"]', "Fur0412*");
+
+    // clicar no botão de login
+    await page.click('button[aria-label="Sign in"]');
+
+    // aguardar um pouco para permitir que a página seja carregada completamente após o login
+    await page.waitForTimeout(5000);
+
+    // redirecionar para a página do perfil
+    await page.goto("https://www.linkedin.com/in/giovana-furlan/");
 
     // pegar conteúdo sobre
     sobre = await page.evaluate(() => {
@@ -93,7 +125,7 @@ const scrapeLogic = async (res) => {
     });
 
     // Retornando a resposta como JSON
-    res.send(screenshot);
+    res.json({ screenshot, title, sobre, funcao, localizacao, experiencias });
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
