@@ -3,7 +3,6 @@ require("dotenv").config();
 
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
-    headless: true,
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
@@ -18,7 +17,7 @@ const scrapeLogic = async (res) => {
   try {
     const page = await browser.newPage();
 
-    await page.goto("https://www.linkedin.com");
+    await page.goto("https://www.linkedin.com/in/joao-pedro-eb/");
 
     // Set screen size
     await page.setViewport({ width: 1080, height: 1024 });
@@ -28,34 +27,11 @@ const scrapeLogic = async (res) => {
     let localizacao;
     let experiencias;
 
-    const screenshot = await page.screenshot({ path: 'screenshot.png' });
-
-    // aguarda até que o elemento esteja disponível na página
-    await page.waitForSelector(".main__sign-in-link");
-
-    // clica no link usando o seletor CSS
-    await page.click(".main__sign-in-link");
-
-    // preencher o campo de e-mail
-    await page.type(
-      'input[name="session_key"]',
-      "backupgiovanafurlan@outlook.com"
-    );
-
-    // preencher o campo de senha
-    await page.type('input[name="session_password"]', "Fur0412*");
-
-    // clicar no botão de login
-    await page.click('button[aria-label="Sign in"]');
-
-    // aguardar um pouco para permitir que a página seja carregada completamente após o login
-    await page.waitForTimeout(5000); // Ajuste o tempo conforme necessário
-
-    // redirecionar para a página do perfil
-    await page.goto("https://www.linkedin.com/in/giovana-furlan/");
-
     // pegar título
     const title = await page.title();
+
+    // tira um print da página e salva como 'screenshot.png'
+    await page.screenshot({ path: 'screenshot.png' });
 
     // pegar conteúdo sobre
     sobre = await page.evaluate(() => {
@@ -117,7 +93,7 @@ const scrapeLogic = async (res) => {
     });
 
     // Retornando a resposta como JSON
-    res.json({ screenshot });
+    res.json({ title, sobre, funcao, localizacao, experiencias });
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
