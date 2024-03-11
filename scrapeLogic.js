@@ -56,8 +56,21 @@ const scrapeLogic = async (res) => {
     // preencher o campo de senha
     await page.type('input[name="session_password"]', "Fur0412*");
 
-    // clicar no botão de login
-    await page.click('button[aria-label="Sign in"]');
+    // Pegar o texto do botão "Sign in"
+    const signInButtonText = await page.evaluate(() => {
+      const signInButton = document.querySelector(
+        'button[data-litms-control-urn="login-submit"]'
+      );
+      return signInButton ? signInButton.textContent.trim() : null;
+    });
+
+    if (signInButtonText === "Sign in") {
+      // Se o texto do botão for "Sign in", então clicar no botão
+      await page.click('button[data-litms-control-urn="login-submit"]');
+      console.log('Clicou no botão "Sign in"');
+    } else {
+      console.log('Não encontrou o botão "Sign in"');
+    }
 
     // aguardar um pouco para permitir que a página seja carregada completamente após o login
     await page.waitForTimeout(5000);
