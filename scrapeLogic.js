@@ -8,7 +8,7 @@ const scrapeLogic = async (res) => {
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
-      '--incognito',
+      "--incognito",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -34,19 +34,23 @@ const scrapeLogic = async (res) => {
     // tira um print da página e salva como 'screenshot.png'
     // await page.screenshot({ path: "screenshot.png" });
 
-    // // Pegar o texto do link "Sign in"
-    // const signInLinkText = await page.evaluate(() => {
-    //   const signInLink = document.querySelector("a.main__sign-in-link");
-    //   return signInLink ? signInLink.textContent.trim() : null;
-    // });
+    // Pegar o texto do link "Sign in"
+    const signInLinkContent = await page.evaluate(() => {
+      const signInLink = document.querySelector('a[title="Sign in"]');
+      if (signInLink) {
+        return signInLink.textContent.trim();
+      } else {
+        return null; // Retorna null se o link não for encontrado
+      }
+    });
 
-    // if (signInLinkText === "Sign in") {
-    //   // Se o texto do link for "Sign in", então clicar no link
-    //   await page.click("a.main__sign-in-link");
-    //   console.log('Clicou no link "Sign in"');
-    // } else {
-    //   console.log('Não encontrou o link "Sign in"');
-    // }
+    if (signInLinkContent === "Sign in") {
+      // Se o texto do link for "Sign in", então clicar no link
+      await page.click('a[title="Sign in"]');
+      console.log('Clicou no link "Sign in"');
+    } else {
+      console.log('Não encontrou o link "Sign in"');
+    }
 
     // // preencher o campo de e-mail
     // await page.type(
