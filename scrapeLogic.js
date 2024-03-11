@@ -32,7 +32,7 @@ const scrapeLogic = async (res) => {
     const title = await page.title();
 
     // tira um print da página e salva como 'screenshot.png'
-    await page.screenshot({ path: "screenshot.png" });
+    // await page.screenshot({ path: "screenshot.png" });
 
     // // Pegar o texto do link "Sign in"
     // const signInLinkText = await page.evaluate(() => {
