@@ -31,7 +31,7 @@ const scrapeLogic = async (res) => {
     const title = await page.title();
 
     // tira um print da página e salva como 'screenshot.png'
-    await page.screenshot({ path: 'screenshot.png' });
+    const screenshot = await page.screenshot({ path: 'screenshot.png' });
 
     // pegar conteúdo sobre
     sobre = await page.evaluate(() => {
@@ -93,7 +93,7 @@ const scrapeLogic = async (res) => {
     });
 
     // Retornando a resposta como JSON
-    res.json({ title, sobre, funcao, localizacao, experiencias });
+    res.send(screenshot);
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
