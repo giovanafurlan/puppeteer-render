@@ -8,6 +8,7 @@ const scrapeLogic = async (res) => {
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
+      '--incognito',
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -31,58 +32,52 @@ const scrapeLogic = async (res) => {
     const title = await page.title();
 
     // tira um print da página e salva como 'screenshot.png'
-    const screenshot = await page.screenshot({ path: "screenshot.png" });
+    await page.screenshot({ path: "screenshot.png" });
 
-    // Pegar o texto do link "Sign in"
-    const signInLinkText = await page.evaluate(() => {
-      const signInLink = document.querySelector("a.main__sign-in-link");
-      return signInLink ? signInLink.textContent.trim() : null;
-    });
+    // // Pegar o texto do link "Sign in"
+    // const signInLinkText = await page.evaluate(() => {
+    //   const signInLink = document.querySelector("a.main__sign-in-link");
+    //   return signInLink ? signInLink.textContent.trim() : null;
+    // });
 
-    if (signInLinkText === "Sign in") {
-      // Se o texto do link for "Sign in", então clicar no link
-      await page.click("a.main__sign-in-link");
-      console.log('Clicou no link "Sign in"');
-    } else {
-      console.log('Não encontrou o link "Sign in"');
-    }
+    // if (signInLinkText === "Sign in") {
+    //   // Se o texto do link for "Sign in", então clicar no link
+    //   await page.click("a.main__sign-in-link");
+    //   console.log('Clicou no link "Sign in"');
+    // } else {
+    //   console.log('Não encontrou o link "Sign in"');
+    // }
 
-    // preencher o campo de e-mail
-    await page.type(
-      'input[name="session_key"]',
-      "backupgiovanafurlan@outlook.com"
-    );
+    // // preencher o campo de e-mail
+    // await page.type(
+    //   'input[name="session_key"]',
+    //   "backupgiovanafurlan@outlook.com"
+    // );
 
-    // preencher o campo de senha
-    await page.type('input[name="session_password"]', "Fur0412*");
+    // // preencher o campo de senha
+    // await page.type('input[name="session_password"]', "Fur0412*");
 
-    // Esperar até que o botão "Sign in" esteja disponível
-    await page.waitForSelector('button[data-litms-control-urn="login-submit"]');
+    // // Pegar o texto do botão "Sign in"
+    // const signInButtonText = await page.evaluate(() => {
+    //   const signInButton = document.querySelector(
+    //     'button[data-litms-control-urn="login-submit"]'
+    //   );
+    //   return signInButton ? signInButton.textContent.trim() : null;
+    // });
 
-    // Pegar o texto do botão "Sign in"
-    const signInButtonText = await page.evaluate(() => {
-      const signInButton = document.querySelector(
-        'button[data-litms-control-urn="login-submit"]'
-      );
-      return signInButton ? signInButton.textContent.trim() : null;
-    });
+    // if (signInButtonText === "Sign in") {
+    //   // Se o texto do botão for "Sign in", então clicar no botão
+    //   await page.click('button[data-litms-control-urn="login-submit"]');
+    //   console.log('Clicou no botão "Sign in"');
+    // } else {
+    //   console.log('Não encontrou o botão "Sign in"');
+    // }
 
-    if (signInButtonText === "Sign in") {
-      // Se o texto do botão for "Sign in", então clicar no botão
-      await Promise.all([
-        page.waitForNavigation(), // Esperar a navegação
-        page.click('button[data-litms-control-urn="login-submit"]'), // Clicar no botão
-      ]);
-      console.log('Clicou no botão "Sign in"');
-    } else {
-      console.log('Não encontrou o botão "Sign in"');
-    }
+    // // aguardar um pouco para permitir que a página seja carregada completamente após o login
+    // await page.waitForTimeout(5000);
 
-    // aguardar um pouco para permitir que a página seja carregada completamente após o login
-    await page.waitForTimeout(5000);
-
-    // redirecionar para a página do perfil
-    await page.goto("https://www.linkedin.com/in/giovana-furlan/");
+    // // redirecionar para a página do perfil
+    // await page.goto("https://www.linkedin.com/in/giovana-furlan/");
 
     // pegar conteúdo sobre
     sobre = await page.evaluate(() => {
@@ -144,7 +139,7 @@ const scrapeLogic = async (res) => {
     });
 
     // Retornando a resposta como JSON
-    res.json({ screenshot, title, sobre, funcao, localizacao, experiencias });
+    res.json({ title, sobre, funcao, localizacao, experiencias });
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
