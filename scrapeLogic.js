@@ -34,23 +34,7 @@ const scrapeLogic = async (res) => {
     // tira um print da página e salva como 'screenshot.png'
     // await page.screenshot({ path: "screenshot.png" });
 
-    // Pegar o texto do link "Sign in"
-    const signInLinkContent = await page.evaluate(() => {
-      const signInLink = document.querySelector('a[title="Sign in"]');
-      if (signInLink) {
-        return signInLink.textContent.trim();
-      } else {
-        return null; // Retorna null se o link não for encontrado
-      }
-    });
-
-    if (signInLinkContent === "Sign in") {
-      // Se o texto do link for "Sign in", então clicar no link
-      await page.click('a[title="Sign in"]');
-      console.log('Clicou no link "Sign in"');
-    } else {
-      console.log('Não encontrou o link "Sign in"');
-    }
+    await page.waitForSelector('.main__sign-in-link').click();
 
     // // preencher o campo de e-mail
     // await page.type(
