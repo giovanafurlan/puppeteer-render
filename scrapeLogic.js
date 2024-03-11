@@ -30,15 +30,6 @@ const scrapeLogic = async (res) => {
     // pegar título
     const title = await page.title();
 
-    // clicar login
-    await page.evaluate(() => {
-      const span = document.querySelector(".main__sign-in-link");
-      if (span) {
-        return span.click();
-      }
-      return null;
-    });
-
     // pegar conteúdo sobre
     sobre = await page.evaluate(() => {
       const span = document.querySelector(".core-section-container__content");
