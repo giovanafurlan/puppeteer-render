@@ -8,6 +8,8 @@ const scrapeLogic = async (res) => {
       "--disable-setuid-sandbox",
       "--no-sandbox",
       "--single-process",
+      "--no-zygote",
+      // '--incognito',
     ],
     executablePath:
       process.env.NODE_ENV === "production"
