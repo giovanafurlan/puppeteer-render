@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 require("dotenv").config();
+const path = require('path');
 
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
@@ -24,7 +25,7 @@ const scrapeLogic = async (res) => {
     // Set screen size
     await page.setViewport({ width: 1080, height: 1024 });
 
-    const screenshot = await page.screenshot({ path: 'screenshot.png' });
+    const screenshot = await page.screenshot({ path: path.resolve(__dirname, 'screenshot.png') });
 
     let sobre;
     let funcao;
