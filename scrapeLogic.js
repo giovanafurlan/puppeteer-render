@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 require("dotenv").config();
-const path = require('path');
+const path = require("path");
 
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
@@ -18,6 +18,11 @@ const scrapeLogic = async (res) => {
         : puppeteer.executablePath(),
   });
   try {
+    let sobre;
+    let funcao;
+    let localizacao;
+    let experiencias;
+
     const page = await browser.newPage();
 
     await page.goto("https://www.linkedin.com/in/joao-pedro-eb/");
@@ -25,12 +30,20 @@ const scrapeLogic = async (res) => {
     // Set screen size
     await page.setViewport({ width: 1080, height: 1024 });
 
-    const screenshot = await page.screenshot({ path: path.resolve(__dirname, 'screenshot.png') });
+    // const screenshot = await page.screenshot({ path: path.resolve(__dirname, 'screenshot.png') });
 
-    let sobre;
-    let funcao;
-    let localizacao;
-    let experiencias;
+    // Encontre o link pelo texto âncora
+    const signInLink = await page.$x(
+      "//p[contains(@class, 'main__sign-in-container')]//a[contains(text(), 'Sign in')]"
+    );
+
+    // Clique no link se ele existir
+    if (signInLink.length > 0) {
+      await signInLink[0].click();
+      console.log('Clicou no link "Sign in"');
+    } else {
+      console.log('Link "Sign in" não encontrado.');
+    }
 
     // pegar título
     const title = await page.title();
