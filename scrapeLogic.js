@@ -3,13 +3,13 @@ require("dotenv").config();
 
 const scrapeLogic = async (res) => {
   const browser = await puppeteer.launch({
-    headless: 'new',
+    // headless: 'new',
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
-      '--incognito',
+      // '--incognito',
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -23,6 +23,8 @@ const scrapeLogic = async (res) => {
 
     // Set screen size
     await page.setViewport({ width: 1080, height: 1024 });
+
+    const screenshot = await page.screenshot({ path: 'screenshot.png' });
 
     let sobre;
     let funcao;
@@ -92,7 +94,8 @@ const scrapeLogic = async (res) => {
     });
 
     // Retornando a resposta como JSON
-    res.json({ title, sobre, funcao, localizacao, experiencias });
+    // res.json({ title, sobre, funcao, localizacao, experiencias });
+    res.send(screenshot);
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
