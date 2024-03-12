@@ -93,7 +93,7 @@ const scrapeLogic = async (res) => {
 
     // Retornando a resposta como JSON
     // res.json({ title, sobre, funcao, localizacao, experiencias });
-    res.send(screenshot);
+    res.json({screenshot});
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
