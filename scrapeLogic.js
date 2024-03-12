@@ -19,8 +19,6 @@ const scrapeLogic = async (res) => {
 
     await page.goto("https://www.linkedin.com/in/joao-pedro-eb/");
 
-    await page.waitForTimeout(5000);
-
     const screenshot = await page.screenshot({ path: 'screenshot.png' });
 
     // Set screen size
