@@ -19,7 +19,7 @@ const scrapeLogic = async (res) => {
 
     await page.goto("https://www.linkedin.com/in/joao-pedro-eb/");
 
-    const screenshot = await page.screenshot({ path: 'screenshot.png' });
+    // const screenshot = await page.screenshot({ path: 'screenshot.png' });
 
     // Set screen size
     await page.setViewport({ width: 1080, height: 1024 });
@@ -92,8 +92,8 @@ const scrapeLogic = async (res) => {
     });
 
     // Retornando a resposta como JSON
-    // res.json({ title, sobre, funcao, localizacao, experiencias });
-    res.json({screenshot});
+    res.json({ title, sobre, funcao, localizacao, experiencias });
+    // res.json({screenshot});
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);
