@@ -127,6 +127,7 @@ const scrapeLogic = async (res, parametro) => {
   });
 
   try {
+    let h1;
     let sobre;
     let funcao;
     let localizacao;
@@ -139,7 +140,8 @@ const scrapeLogic = async (res, parametro) => {
     console.log("Abre a página");
 
     // Define o tamanho da tela
-    await page.setViewport({ width: 2000, height: 2000 });
+    await page.setViewport({ width: 1500, height: 800 });
+    console.log("Define o tamanho da tela");
 
     // // Navega para o LinkedIn
     // await page.goto("https://www.linkedin.com/signup", {
@@ -172,7 +174,7 @@ const scrapeLogic = async (res, parametro) => {
     // await page.screenshot({ path: path.resolve(__dirname, "sign.png") });
 
     // // Obtém o título da página
-    // const title = await page.title();
+    // const h1 = await page.h1();
     // console.log("Obtém o título da página");
 
     // // Aguarda até que o seletor do campo de entrada esteja disponível na página
@@ -221,7 +223,7 @@ const scrapeLogic = async (res, parametro) => {
     // Redireciona para a página do perfil
     // Navega para o LinkedIn
     await page.goto(parametro, {
-      waitUntil: "load",
+      waitUntil: "networkidle0",
       timeout: 0,
     });
     console.log("Espera o LinkedIn");
@@ -230,8 +232,18 @@ const scrapeLogic = async (res, parametro) => {
     // console.log("Redireciona para a página do perfil");
 
     // Obtém o título da página
-    const title = await page.title();
-    console.log("Obtém o título da página");
+    // const title = await page.title();
+    // console.log("Obtém o título da página");
+
+    // pegar conteúdo h1
+    // h1 = await page.evaluate(() => {
+    //   const h1 = document.querySelector(".top-card-layout__h1");
+    //   if (h1) {
+    //     return h1.textContent.trim();
+    //   }
+    //   return null;
+    // });
+    // console.log("pegar conteúdo h1");
 
     // Captura uma screenshot da página
     await page.screenshot({ path: path.resolve(__dirname, "profile.png") });
@@ -278,28 +290,39 @@ const scrapeLogic = async (res, parametro) => {
 
       experienceItems.forEach((item) => {
         console.log("item");
-        const empresa = item
-          .querySelector(".experience-item__subtitle")
-          .textContent.trim();
-        console.log("empresa");
-        const duracao = item.querySelector(".date-range").textContent.trim();
-        console.log("duracao");
-        const localizacao = item
-          .querySelectorAll(".experience-item__meta-item")[1]
-          .textContent.trim();
-        console.log("localizacao");
-        const descricao = item
-          .querySelector(".show-more-less-text__text--less")
-          .textContent.trim();
-        console.log("descricao");
+        const empresaElement = item.querySelector(".experience-item__subh1");
+        const duracaoElement = item.querySelector(".date-range");
+        const localizacaoElement = item.querySelectorAll(
+          ".experience-item__meta-item"
+        )[1];
+        const descricaoElement = item.querySelector(
+          ".show-more-less-text__text--less"
+        );
 
-        experiencesArray.push({
-          empresa,
-          duracao,
-          localizacao,
-          descricao,
-        });
-        console.log("experiencesArray");
+        // Verifica se todos os elementos foram encontrados
+        if (
+          empresaElement &&
+          duracaoElement &&
+          localizacaoElement &&
+          descricaoElement
+        ) {
+          console.log("empresa");
+          const empresa = empresaElement.textContent.trim();
+          console.log("duracao");
+          const duracao = duracaoElement.textContent.trim();
+          console.log("localizacao");
+          const localizacao = localizacaoElement.textContent.trim();
+          console.log("descricao");
+          const descricao = descricaoElement.textContent.trim();
+
+          experiencesArray.push({
+            empresa,
+            duracao,
+            localizacao,
+            descricao,
+          });
+          console.log("experiencesArray");
+        }
       });
 
       return experiencesArray;
@@ -307,7 +330,7 @@ const scrapeLogic = async (res, parametro) => {
     console.log("pegar conteúdo experiências");
 
     // Retornando a resposta como JSON
-    res.json({ title, sobre, funcao, localizacao, experiencias });
+    res.json({ h1, sobre, funcao, localizacao, experiencias });
   } catch (e) {
     console.error(e);
     res.send(`Algo deu errado ao executar o Puppeteer: ${e}`);
