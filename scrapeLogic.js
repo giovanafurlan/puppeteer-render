@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 require("dotenv").config();
 const path = require("path");
 
-const scrapeLogic = async (res) => {
+const scrapeLogic = async (res, parametro) => {
   // Lista de proxies omitida por brevidade
   const proxyList = [
     "38.162.18.61:3128",
@@ -112,14 +112,14 @@ const scrapeLogic = async (res) => {
 
   const browser = await puppeteer.launch({
     // Configurações do navegador
-    // headless: false,
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-      `--proxy-server=${randomProxy}`,
-    ],
+    headless: false,
+    // args: [
+    //   "--disable-setuid-sandbox",
+    //   "--no-sandbox",
+    //   "--single-process",
+    //   "--no-zygote",
+    //   `--proxy-server=${randomProxy}`,
+    // ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
@@ -132,9 +132,14 @@ const scrapeLogic = async (res) => {
     let localizacao;
     let experiencias;
 
+    console.log("parametro", parametro);
+
     // Abre uma nova página
     const page = await browser.newPage();
     console.log("Abre a página");
+
+    // Define o tamanho da tela
+    await page.setViewport({ width: 2000, height: 2000 });
 
     // // Navega para o LinkedIn
     // await page.goto("https://www.linkedin.com/signup", {
@@ -146,9 +151,6 @@ const scrapeLogic = async (res) => {
 
     // await page.goto("https://www.linkedin.com/signup");
     // console.log("Navega para o LinkedIn");
-
-    // // Define o tamanho da tela
-    // await page.setViewport({ width: 1080, height: 1024 });
 
     // // Obtém o texto do link "Sign in"
     // const signInLinkText = await page.evaluate(() => {
@@ -217,11 +219,15 @@ const scrapeLogic = async (res) => {
     // }
 
     // Redireciona para a página do perfil
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: "networkidle0" }),
-      page.goto("https://www.linkedin.com/in/fernandonicolodi/"),
-    ]);
-    console.log("Redireciona para a página do perfil");
+    // Navega para o LinkedIn
+    await page.goto(parametro, {
+      waitUntil: "load",
+      timeout: 0,
+    });
+    console.log("Espera o LinkedIn");
+
+    // await page.goto(parametro);
+    // console.log("Redireciona para a página do perfil");
 
     // Obtém o título da página
     const title = await page.title();
@@ -238,6 +244,7 @@ const scrapeLogic = async (res) => {
       }
       return null;
     });
+    console.log("pegar conteúdo sobre");
 
     // pegar conteúdo função
     funcao = await page.evaluate(() => {
@@ -247,6 +254,7 @@ const scrapeLogic = async (res) => {
       }
       return null;
     });
+    console.log("pegar conteúdo função");
 
     // pegar conteúdo localização
     localizacao = await page.evaluate(() => {
@@ -258,25 +266,32 @@ const scrapeLogic = async (res) => {
       }
       return null;
     });
+    console.log("pegar conteúdo localização");
 
     // pegar conteúdo experiências
     experiencias = await page.evaluate(() => {
       const experienceItems = document.querySelectorAll(
         'section[data-section="experience"] .experience-item'
       );
+      console.log("experienceItems");
       const experiencesArray = [];
 
       experienceItems.forEach((item) => {
+        console.log("item");
         const empresa = item
           .querySelector(".experience-item__subtitle")
           .textContent.trim();
+        console.log("empresa");
         const duracao = item.querySelector(".date-range").textContent.trim();
+        console.log("duracao");
         const localizacao = item
           .querySelectorAll(".experience-item__meta-item")[1]
           .textContent.trim();
+        console.log("localizacao");
         const descricao = item
           .querySelector(".show-more-less-text__text--less")
           .textContent.trim();
+        console.log("descricao");
 
         experiencesArray.push({
           empresa,
@@ -284,10 +299,12 @@ const scrapeLogic = async (res) => {
           localizacao,
           descricao,
         });
+        console.log("experiencesArray");
       });
 
       return experiencesArray;
     });
+    console.log("pegar conteúdo experiências");
 
     // Retornando a resposta como JSON
     res.json({ title, sobre, funcao, localizacao, experiencias });
