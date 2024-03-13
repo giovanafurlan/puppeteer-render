@@ -112,13 +112,14 @@ const scrapeLogic = async (res) => {
 
   const browser = await puppeteer.launch({
     // Configurações do navegador
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-      `--proxy-server=${randomProxy}`,
-    ],
+    headless: false,
+    // args: [
+    //   "--disable-setuid-sandbox",
+    //   "--no-sandbox",
+    //   "--single-process",
+    //   "--no-zygote",
+    //   `--proxy-server=${randomProxy}`,
+    // ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
@@ -135,65 +136,161 @@ const scrapeLogic = async (res) => {
     const page = await browser.newPage();
     console.log("Abre a página");
 
-    // Navega para o LinkedIn
-    await page.goto("https://www.linkedin.com/signup", { timeout: 60000 });
-    console.log("Navega para o LinkedIn");
+    // // Navega para o LinkedIn
+    // await page.goto("https://www.linkedin.com/signup", {
+    //   waitUntil: "load",
+    //   // Remove the timeout
+    //   timeout: 0,
+    // });
+    // console.log("Espera o LinkedIn");
 
-    // Define o tamanho da tela
-    await page.setViewport({ width: 1080, height: 1024 });
+    // await page.goto("https://www.linkedin.com/signup");
+    // console.log("Navega para o LinkedIn");
 
-    // Obtém o texto do link "Sign in"
-    const signInLinkText = await page.evaluate(() => {
-      const signInLink = document.querySelector(
-        ".main__sign-in-container a.main__sign-in-link"
-      );
-      return signInLink ? signInLink.textContent.trim() : null;
-    });
+    // // Define o tamanho da tela
+    // await page.setViewport({ width: 1080, height: 1024 });
 
-    if (signInLinkText === "Sign in") {
-      // Se o texto do link for "Sign in", então clica no link
-      await page.click(".main__sign-in-container a.main__sign-in-link");
-      console.log('Clicou no link "Sign in"');
-    } else {
-      console.log('Não encontrou o link "Sign in"');
-    }
+    // // Obtém o texto do link "Sign in"
+    // const signInLinkText = await page.evaluate(() => {
+    //   const signInLink = document.querySelector(
+    //     ".main__sign-in-container a.main__sign-in-link"
+    //   );
+    //   return signInLink ? signInLink.textContent.trim() : null;
+    // });
 
-    // Captura uma screenshot da página
-    await page.screenshot({ path: path.resolve(__dirname, "screenshot.png") });
+    // if (signInLinkText === "Sign in" || "Entrar") {
+    //   // Se o texto do link for "Sign in", então clica no link
+    //   await page.click(".main__sign-in-container a.main__sign-in-link");
+    //   console.log('Clicou no link "Sign in" || "Entrar"');
+    // } else {
+    //   console.log('Não encontrou o link "Sign in" || "Entrar"');
+    // }
+
+    // // Captura uma screenshot da página
+    // await page.screenshot({ path: path.resolve(__dirname, "sign.png") });
+
+    // // Obtém o título da página
+    // const title = await page.title();
+    // console.log("Obtém o título da página");
+
+    // // Aguarda até que o seletor do campo de entrada esteja disponível na página
+    // await page.waitForSelector('input[name="session_key"]');
+    // console.log(
+    //   "Aguarda até que o seletor do email esteja disponível na página"
+    // );
+
+    // // Digita o endereço de e-mail no campo de entrada
+    // await page.type(
+    //   'input[name="session_key"]',
+    //   "backupgiovanafurlan@outlook.com"
+    // );
+    // console.log("Digita o endereço de e-mail no campo de entrada");
+
+    // // Aguarda até que o seletor do campo de entrada esteja disponível na página
+    // await page.waitForSelector('input[name="session_password"]');
+    // console.log(
+    //   "Aguarda até que o seletor da senha esteja disponível na página"
+    // );
+
+    // // Preenche o campo de senha
+    // await page.type('input[name="session_password"]', "Fur0412*");
+    // console.log("Preenche o campo de senha");
+
+    // // Clica no botão de login
+    // // await page.click('button[aria-label="Sign in"]');
+    // // console.log("Clica no botão de login");
+    // const signButtonText = await page.evaluate(() => {
+    //   const signInButton = document.querySelector(
+    //     ".login__form_action_container button.btn__primary--large"
+    //   );
+    //   return signInButton ? signInButton.textContent.trim() : null;
+    // });
+
+    // if (signButtonText === "Sign in" || "Entrar") {
+    //   // Se o texto do link for "Sign in", então clica no link
+    //   await page.click(
+    //     ".login__form_action_container button.btn__primary--large"
+    //   );
+    //   console.log('Clicou no link "Sign in" || "Entrar"');
+    // } else {
+    //   console.log('Não encontrou o link "Sign in" || "Entrar"');
+    // }
+
+    // Redireciona para a página do perfil
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: "networkidle0" }),
+      page.goto("https://www.linkedin.com/in/giovana-furlan/"),
+    ]);
+    console.log("Redireciona para a página do perfil");
 
     // Obtém o título da página
     const title = await page.title();
     console.log("Obtém o título da página");
 
-    // Aguarda até que o seletor do campo de entrada esteja disponível na página
-    await page.waitForSelector('input[name="session_key"]');
-    console.log("Aguarda até que o seletor do email esteja disponível na página");
+    // Captura uma screenshot da página
+    await page.screenshot({ path: path.resolve(__dirname, "profile.png") });
 
-    // Digita o endereço de e-mail no campo de entrada
-    await page.type(
-      'input[name="session_key"]',
-      "backupgiovanafurlan@outlook.com"
-    );
-    console.log("Digita o endereço de e-mail no campo de entrada");
+    // pegar conteúdo sobre
+    sobre = await page.evaluate(() => {
+      const span = document.querySelector(".core-section-container__content");
+      if (span) {
+        return span.textContent.trim();
+      }
+      return null;
+    });
 
-    // Aguarda até que o seletor do campo de entrada esteja disponível na página
-    await page.waitForSelector('input[name="session_password"]');
-    console.log("Aguarda até que o seletor da senha esteja disponível na página");
+    // pegar conteúdo função
+    funcao = await page.evaluate(() => {
+      const span = document.querySelector(".top-card-layout__headline");
+      if (span) {
+        return span.textContent.trim();
+      }
+      return null;
+    });
 
-    // Preenche o campo de senha
-    await page.type('input[name="session_password"]', "Fur0412*");
-    console.log("Preenche o campo de senha");
+    // pegar conteúdo localização
+    localizacao = await page.evaluate(() => {
+      const span = document.querySelector(
+        "div.not-first-middot span:first-child"
+      );
+      if (span) {
+        return span.textContent.trim();
+      }
+      return null;
+    });
 
-    // Clica no botão de login
-    await page.click('button[aria-label="Sign in"]');
-    console.log("Clica no botão de login");
+    // pegar conteúdo experiências
+    experiencias = await page.evaluate(() => {
+      const experienceItems = document.querySelectorAll(
+        'section[data-section="experience"] .experience-item'
+      );
+      const experiencesArray = [];
 
-    // Redireciona para a página do perfil
-    await page.goto("https://www.linkedin.com/in/giovana-furlan/");
-    console.log("Redireciona para a página do perfil");
+      experienceItems.forEach((item) => {
+        const empresa = item
+          .querySelector(".experience-item__subtitle")
+          .textContent.trim();
+        const duracao = item.querySelector(".date-range").textContent.trim();
+        const localizacao = item
+          .querySelectorAll(".experience-item__meta-item")[1]
+          .textContent.trim();
+        const descricao = item
+          .querySelector(".show-more-less-text__text--less")
+          .textContent.trim();
+
+        experiencesArray.push({
+          empresa,
+          duracao,
+          localizacao,
+          descricao,
+        });
+      });
+
+      return experiencesArray;
+    });
 
     // Retornando a resposta como JSON
-    res.json({ title });
+    res.json({ title, sobre, funcao, localizacao, experiencias });
   } catch (e) {
     console.error(e);
     res.send(`Algo deu errado ao executar o Puppeteer: ${e}`);
