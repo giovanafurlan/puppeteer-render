@@ -113,13 +113,13 @@ const scrapeLogic = async (res, parametro) => {
   const browser = await puppeteer.launch({
     // Configurações do navegador
     headless: false,
-    // args: [
-    //   "--disable-setuid-sandbox",
-    //   "--no-sandbox",
-    //   "--single-process",
-    //   "--no-zygote",
-    //   `--proxy-server=${randomProxy}`,
-    // ],
+    args: [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote",
+      `--proxy-server=${randomProxy}`,
+    ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
