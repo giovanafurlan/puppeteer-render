@@ -111,14 +111,15 @@ const scrapeLogic = async (res, parametro) => {
   const randomProxy = proxyList[Math.floor(Math.random() * proxyList.length)];
 
   const browser = await puppeteer.launch({
+    // Configurações do navegador
     // headless: false,
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-      `--proxy-server=${randomProxy}`,
-    ],
+    // args: [
+    //   "--disable-setuid-sandbox",
+    //   "--no-sandbox",
+    //   "--single-process",
+    //   "--no-zygote",
+    //   `--proxy-server=${randomProxy}`,
+    // ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
@@ -126,35 +127,60 @@ const scrapeLogic = async (res, parametro) => {
   });
 
   try {
-    let h1;
+    let botaoSobre;
     let sobre;
     let funcao;
     let localizacao;
     let experiencias;
 
+    // abre uma nova página
     const page = await browser.newPage();
+    console.log("Abre a página");
 
+    // define o tamanho da tela
     await page.setViewport({ width: 2000, height: 2000 });
+    console.log("Define o tamanho da tela");
 
-    await page.goto(parametro);
+    // redireciona para a página do perfil
+    await page.goto(parametro, {
+      waitUntil: "networkidle2",
+    });
+    console.log("Redireciona para a página do perfil");
 
+    // captura uma screenshot da página
     await page.screenshot({ path: path.resolve(__dirname, "profile.png") });
+    console.log("Captura uma screenshot da página");
 
+    // pega título da página
+    const title = await page.title();
+    console.log("pega título da página");
+
+    // fecha o modal
     await page.waitForSelector(".modal__dismiss");
     await page.click(".modal__dismiss");
+    console.log("fecha o modal");
 
-    sobre = await page.evaluate(() => {
+    // checa se o botão de abrir o sobre existe
+    botaoSobre = await page.evaluate(() => {
       try {
-        const span = document.querySelector(".core-section-container__content");
-        if (span) {
-          return span.textContent.trim();
+        const button = document.querySelector(".sign-in-modal__outlet-btn");
+        if (button) {
+          return (sobre = null), console.log("sobre não existe");
+        } else {
+          // pega conteúdo sobre
+          sobre = document
+            .querySelector(".core-section-container__content")
+            .textContent.trim();
+          console.log("pega conteúdo sobre");
         }
         throw new Error("Elemento não encontrado");
       } catch (error) {
         return null;
       }
     });
+    console.log("checa se o botão de abrir o sobre existe");
 
+    // pega conteúdo função
     funcao = await page.evaluate(() => {
       try {
         const span = document.querySelector(".top-card-layout__headline");
@@ -166,7 +192,9 @@ const scrapeLogic = async (res, parametro) => {
         return null;
       }
     });
+    console.log("pega conteúdo função");
 
+    // pega conteúdo localização
     localizacao = await page.evaluate(() => {
       try {
         const span = document.querySelector(
@@ -180,7 +208,9 @@ const scrapeLogic = async (res, parametro) => {
         return null;
       }
     });
+    console.log("pega conteúdo localização");
 
+    // pega conteúdo experiências
     experiencias = await page.evaluate(() => {
       try {
         const experienceItems = document.querySelectorAll(
@@ -198,6 +228,7 @@ const scrapeLogic = async (res, parametro) => {
             ".show-more-less-text__text--less"
           );
 
+          // Verifica se todos os elementos foram encontrados
           if (
             empresaElement &&
             duracaoElement &&
@@ -225,8 +256,10 @@ const scrapeLogic = async (res, parametro) => {
         return null;
       }
     });
+    console.log("pega conteúdo experiências");
 
-    res.json({ h1, sobre, funcao, localizacao, experiencias });
+    // Retornando a resposta como JSON
+    res.json({ title, sobre, funcao, localizacao, experiencias });
   } catch (e) {
     console.error(e);
     res.json({
