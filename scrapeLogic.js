@@ -112,7 +112,7 @@ const scrapeLogic = async (res, parametro) => {
 
   const browser = await puppeteer.launch({
     // Configurações do navegador
-    // headless: false,
+    headless: false,
     // args: [
     //   "--disable-setuid-sandbox",
     //   "--no-sandbox",
@@ -140,7 +140,7 @@ const scrapeLogic = async (res, parametro) => {
     console.log("Abre a página");
 
     // Define o tamanho da tela
-    await page.setViewport({ width: 1500, height: 800 });
+    await page.setViewport({ width: 2000, height: 2000 });
     console.log("Define o tamanho da tela");
 
     // // Navega para o LinkedIn
@@ -247,6 +247,14 @@ const scrapeLogic = async (res, parametro) => {
 
     // Captura uma screenshot da página
     await page.screenshot({ path: path.resolve(__dirname, "profile.png") });
+
+    // Aguarda até que o botão modal__dismiss esteja disponível na página
+    await page.waitForSelector('.modal__dismiss');
+    console.log("Aguardou até que o botão modal__dismiss estivesse disponível");
+
+    // Clica no botão modal__dismiss
+    await page.click('.modal__dismiss');
+    console.log("Clicou no botão modal__dismiss");
 
     // pegar conteúdo sobre
     sobre = await page.evaluate(() => {
