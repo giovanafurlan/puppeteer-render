@@ -113,13 +113,13 @@ const scrapeLogic = async (res, parametro) => {
   const browser = await puppeteer.launch({
     // Configurações do navegador
     // headless: false,
-    // args: [
-    //   "--disable-setuid-sandbox",
-    //   "--no-sandbox",
-    //   "--single-process",
-    //   "--no-zygote",
-    //   `--proxy-server=${randomProxy}`,
-    // ],
+    args: [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      // "--single-process",
+      // "--no-zygote",
+      // `--proxy-server=${randomProxy}`,
+    ],
     executablePath:
       process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
@@ -127,7 +127,6 @@ const scrapeLogic = async (res, parametro) => {
   });
 
   try {
-    let botaoSobre;
     let sobre;
     let funcao;
     let localizacao;
@@ -148,8 +147,8 @@ const scrapeLogic = async (res, parametro) => {
     console.log("Redireciona para a página do perfil");
 
     // captura uma screenshot da página
-    await page.screenshot({ path: path.resolve(__dirname, "profile.png") });
-    console.log("Captura uma screenshot da página");
+    // await page.screenshot({ path: path.resolve(__dirname, "profile.png") });
+    // console.log("Captura uma screenshot da página");
 
     // pega título da página
     const title = await page.title();
@@ -161,23 +160,18 @@ const scrapeLogic = async (res, parametro) => {
     console.log("fecha o modal");
 
     // checa se o botão de abrir o sobre existe
-    botaoSobre = await page.evaluate(() => {
-      try {
-        const button = document.querySelector(".sign-in-modal__outlet-btn");
-        if (button) {
-          return (sobre = null), console.log("sobre não existe");
-        } else {
-          // pega conteúdo sobre
-          sobre = document
-            .querySelector(".core-section-container__content")
-            .textContent.trim();
-          console.log("pega conteúdo sobre");
+    const buttonExists = await page.$(".sign-in-modal__outlet-btn");
+    if (buttonExists !== null) {
+      // pega conteúdo sobre
+      sobre = await page.evaluate(() => {
+        const span = document.querySelector(".core-section-container__content");
+        if (span) {
+          return span.textContent.trim();
         }
-        throw new Error("Elemento não encontrado");
-      } catch (error) {
         return null;
-      }
-    });
+      });
+      console.log("pega conteúdo sobre");
+    }
     console.log("checa se o botão de abrir o sobre existe");
 
     // pega conteúdo função
