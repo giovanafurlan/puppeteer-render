@@ -116,9 +116,9 @@ const scrapeLogic = async (res, parametro) => {
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
-      // "--single-process",
-      // "--no-zygote",
-      // `--proxy-server=${randomProxy}`,
+      "--single-process",
+      "--no-zygote",
+      `--proxy-server=${randomProxy}`,
       "--incognito",
     ],
     executablePath:
