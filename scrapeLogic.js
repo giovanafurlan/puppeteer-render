@@ -119,6 +119,7 @@ const scrapeLogic = async (res, parametro) => {
       // "--single-process",
       // "--no-zygote",
       // `--proxy-server=${randomProxy}`,
+      "--incognito",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -127,6 +128,7 @@ const scrapeLogic = async (res, parametro) => {
   });
 
   try {
+    let title;
     let sobre;
     let funcao;
     let localizacao;
@@ -134,50 +136,137 @@ const scrapeLogic = async (res, parametro) => {
 
     // abre uma nova página
     const page = await browser.newPage();
-    console.log("Abre a página");
+    console.log("abre a página");
 
     // define o tamanho da tela
-    await page.setViewport({ width: 2000, height: 2000 });
-    console.log("Define o tamanho da tela");
+    await page.setViewport({ width: 2000, height: 3000 });
+    console.log("define o tamanho da tela");
 
-    // redireciona para a página do perfil
-    await page.goto(parametro, {
+    // navega para o LinkedIn
+    await page.goto("https://www.linkedin.com/", {
       waitUntil: "networkidle2",
     });
-    console.log("Redireciona para a página do perfil");
+    console.log("navega para o LinkedIn");
 
-    // captura uma screenshot da página
+    // // obtém o texto do link "Sign in"
+    // const signInLinkText = await page.evaluate(() => {
+    //   const signInLink = document.querySelector(
+    //     ".main__sign-in-container a.main__sign-in-link"
+    //   );
+    //   return signInLink ? signInLink.textContent.trim() : null;
+    // });
+
+    // if (signInLinkText === "Sign in" || "Entrar") {
+    //   // Se o texto do link for "Sign in", então clica no link
+    //   await page.click(".main__sign-in-container a.main__sign-in-link");
+    //   console.log('clicou no link "Sign in" || "Entrar"');
+    // } else {
+    //   console.log('não encontrou o link "Sign in" || "Entrar"');
+    // }
+
+    // // captura uma screenshot da página
+    // await page.screenshot({ path: path.resolve(__dirname, "screenshot1.png") });
+
+    // aguarda até que o seletor do campo de entrada esteja disponível na página
+    await page.waitForSelector('input[name="session_key"]');
+    console.log(
+      "aguarda até que o seletor do email esteja disponível na página"
+    );
+
+    // digita o endereço de e-mail no campo de entrada
+    await page.type(
+      'input[name="session_key"]',
+      "backupgiovanafurlan@outlook.com"
+    );
+    console.log("digita o endereço de e-mail no campo de entrada");
+
+    // aguarda até que o seletor do campo de entrada esteja disponível na página
+    await page.waitForSelector('input[name="session_password"]');
+    console.log(
+      "aguarda até que o seletor da senha esteja disponível na página"
+    );
+
+    // preenche o campo de senha
+    await page.type('input[name="session_password"]', "Fur0412*");
+    console.log("preenche o campo de senha");
+
+    // // captura uma screenshot da página
+    // await page.screenshot({ path: path.resolve(__dirname, "screenshot1.png") });
+
+    // clica no botão de login
+    await page.click("button.sign-in-form__submit-btn--full-width");
+    console.log("clica no botão de login");
+
+    // // captura uma screenshot da página
+    // await page.screenshot({ path: path.resolve(__dirname, "screenshot2.png") });
+
+    // // espera até que não haja mais atividade na rede
+    // await page.waitForNavigation({
+    //   waitUntil: "networkidle0",
+    // });
+    // console.log("espera até que não haja mais atividade na rede");
+
+    // aguarda até que o seletor específico esteja presente na página
+    await page.waitForSelector("#ember47");
+    console.log(
+      "aguarda até que o seletor específico esteja presente na página"
+    );
+
+    // redireciona para a página do perfil
+    await page.goto(parametro);
+    console.log("redireciona para a página do perfil");
+
+    // aguarda até que o seletor específico esteja presente na página
+    await page.waitForSelector(".pvs-header__title");
+    console.log(
+      "aguarda até que o seletor específico esteja presente na página"
+    );
+
+    // fecha o modal
+    // await page.waitForSelector(".modal__dismiss");
+    // await page.click(".modal__dismiss");
+    // console.log("fecha o modal");
+
+    // // captura uma screenshot da página
     // await page.screenshot({ path: path.resolve(__dirname, "profile.png") });
     // console.log("Captura uma screenshot da página");
 
-    // pega título da página
-    const title = await page.title();
-    console.log("pega título da página");
+    // abre o conteúdo de sobre
+    await page.waitForSelector(".inline-show-more-text__button");
+    await page.click(".inline-show-more-text__button");
+    console.log("abre o conteúdo de sobre");
 
-    // fecha o modal
-    await page.waitForSelector(".modal__dismiss");
-    await page.click(".modal__dismiss");
-    console.log("fecha o modal");
+    // captura uma screenshot da página
+    await page.screenshot({ path: path.resolve(__dirname, "perfil.png") });
 
-    // checa se o botão de abrir o sobre existe
-    const buttonExists = await page.$(".sign-in-modal__outlet-btn");
-    if (buttonExists !== null) {
-      // pega conteúdo sobre
-      sobre = await page.evaluate(() => {
-        const span = document.querySelector(".core-section-container__content");
-        if (span) {
-          return span.textContent.trim();
-        }
-        return null;
-      });
-      console.log("pega conteúdo sobre");
-    }
-    console.log("checa se o botão de abrir o sobre existe");
+    // // pega título da página
+    // const title = await page.title();
+    // console.log("pega título da página");
+
+    // pega conteúdo title
+    title = await page.evaluate(() => {
+      const span = document.querySelector(".text-heading-xlarge");
+      if (span) {
+        return span.textContent.trim();
+      }
+      return null;
+    });
+    console.log("pega conteúdo title");
+
+    // pega conteúdo sobre
+    sobre = await page.evaluate(() => {
+      const span = document.querySelector("div.pv-shared-text-with-see-more span");
+      if (span) {
+        return span.textContent.trim();
+      }
+      return null;
+    });
+    console.log("pega conteúdo sobre");
 
     // pega conteúdo função
     funcao = await page.evaluate(() => {
       try {
-        const span = document.querySelector(".top-card-layout__headline");
+        const span = document.querySelector(".text-body-medium");
         if (span) {
           return span.textContent.trim();
         }
@@ -192,7 +281,7 @@ const scrapeLogic = async (res, parametro) => {
     localizacao = await page.evaluate(() => {
       try {
         const span = document.querySelector(
-          "div.not-first-middot span:first-child"
+          ".text-body-small"
         );
         if (span) {
           return span.textContent.trim();
@@ -204,56 +293,56 @@ const scrapeLogic = async (res, parametro) => {
     });
     console.log("pega conteúdo localização");
 
-    // pega conteúdo experiências
-    experiencias = await page.evaluate(() => {
-      try {
-        const experienceItems = document.querySelectorAll(
-          'section[data-section="experience"] .experience-item'
-        );
-        const experiencesArray = [];
+    // // pega conteúdo experiências
+    // experiencias = await page.evaluate(() => {
+    //   try {
+    //     const experienceItems = document.querySelectorAll(
+    //       'section[data-section="experience"] .experience-item'
+    //     );
+    //     const experiencesArray = [];
 
-        experienceItems.forEach((item) => {
-          const empresaElement = item.querySelector(".experience-item__subh1");
-          const duracaoElement = item.querySelector(".date-range");
-          const localizacaoElement = item.querySelectorAll(
-            ".experience-item__meta-item"
-          )[1];
-          const descricaoElement = item.querySelector(
-            ".show-more-less-text__text--less"
-          );
+    //     experienceItems.forEach((item) => {
+    //       const empresaElement = item.querySelector(".experience-item__subh1");
+    //       const duracaoElement = item.querySelector(".date-range");
+    //       const localizacaoElement = item.querySelectorAll(
+    //         ".experience-item__meta-item"
+    //       )[1];
+    //       const descricaoElement = item.querySelector(
+    //         ".show-more-less-text__text--less"
+    //       );
 
-          // Verifica se todos os elementos foram encontrados
-          if (
-            empresaElement &&
-            duracaoElement &&
-            localizacaoElement &&
-            descricaoElement
-          ) {
-            const empresa = empresaElement.textContent.trim();
-            const duracao = duracaoElement.textContent.trim();
-            const localizacao = localizacaoElement.textContent.trim();
-            const descricao = descricaoElement.textContent.trim();
+    //       // Verifica se todos os elementos foram encontrados
+    //       if (
+    //         empresaElement &&
+    //         duracaoElement &&
+    //         localizacaoElement &&
+    //         descricaoElement
+    //       ) {
+    //         const empresa = empresaElement.textContent.trim();
+    //         const duracao = duracaoElement.textContent.trim();
+    //         const localizacao = localizacaoElement.textContent.trim();
+    //         const descricao = descricaoElement.textContent.trim();
 
-            experiencesArray.push({
-              empresa,
-              duracao,
-              localizacao,
-              descricao,
-            });
-          } else {
-            throw new Error("Elemento não encontrado");
-          }
-        });
+    //         experiencesArray.push({
+    //           empresa,
+    //           duracao,
+    //           localizacao,
+    //           descricao,
+    //         });
+    //       } else {
+    //         throw new Error("Elemento não encontrado");
+    //       }
+    //     });
 
-        return experiencesArray;
-      } catch (error) {
-        return null;
-      }
-    });
-    console.log("pega conteúdo experiências");
+    //     return experiencesArray;
+    //   } catch (error) {
+    //     return null;
+    //   }
+    // });
+    // console.log("pega conteúdo experiências");
 
     // Retornando a resposta como JSON
-    res.json({ title, sobre, funcao, localizacao, experiencias });
+    res.json({ title, sobre, funcao, localizacao });
   } catch (e) {
     console.error(e);
     res.json({
