@@ -118,8 +118,7 @@ const scrapeLogic = async (res, parametro) => {
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
-      `--proxy-server=${randomProxy}`,
-      "--incognito",
+      `--proxy-server=${randomProxy}`
     ],
     executablePath:
       process.env.NODE_ENV === "production"
