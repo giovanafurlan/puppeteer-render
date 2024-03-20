@@ -5,7 +5,7 @@ const { ZenRows } = require("zenrows");
 
 const scrapeLogic = async (res, parametro) => {
   // Inicializa o cliente ZenRows com sua chave de API
-  const zenrowsClient = new ZenRows("SUA_CHAVE_DE_API_AQUI");
+  const zenrowsClient = new ZenRows("4b839f58e12d521cfba215d044f3f2655aed5d14");
 
   try {
     // Faz uma solicitação para obter o link LinkedIn com o ZenRows
